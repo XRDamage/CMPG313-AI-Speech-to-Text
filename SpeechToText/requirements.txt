@@ -1,3 +1,9 @@
+whisper
+queue
+tempfile
+signal
+click
+tkinter
 numpy
 tqdm
 more-itertools

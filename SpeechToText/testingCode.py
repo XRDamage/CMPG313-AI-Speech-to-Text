@@ -5,6 +5,38 @@ from scipy.signal import butter, lfilter
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import ttk
+import os
+import signal
+
+
+
+def visualize_audio():
+    data = stream.read(CHUNK_SIZE)
+    samples = np.frombuffer(data, dtype=np.int16)
+    samples = samples / 32768.0
+    wave = np.sin(np.arange(CHUNK_SIZE) * (1 * np.pi * 1 / CHUNK_SIZE))
+    modulated_wave = samples * wave
+    filtered_wave = lfilter(b, a, modulated_wave)
+    line.set_ydata(filtered_wave)
+    # ax.fill_between(x, 0, filtered_wave, where=filtered_wave>=0, interpolate=True, color='blue', alpha=0.25)
+    # ax.fill_between(x, 0, filtered_wave, where=filtered_wave<0, interpolate=True, color='red', alpha=0.25)
+    fig.canvas.draw()
+    plt.pause(0.001)
+    if streaming.get():
+        root.after(1, visualize_audio)
+
+
+def start_streaming():
+    global streaming
+    streaming.set(True)
+    visualize_audio()
+
+def stop_streaming():
+    global streaming
+    streaming.set(False)
+    os.kill(os.getpid(), signal.SIGINT)
+
+
 
 CHUNK_SIZE = 1024
 FORMAT = pyaudio.paInt16
@@ -35,31 +67,6 @@ cutoff = 500
 order = 5
 normal_cutoff = cutoff / nyq
 b, a = butter(order, normal_cutoff, btype='low', analog=False)
-
-def visualize_audio():
-    data = stream.read(CHUNK_SIZE)
-    samples = np.frombuffer(data, dtype=np.int16)
-    samples = samples / 32768.0
-    wave = np.sin(np.arange(CHUNK_SIZE) * (1 * np.pi * 1 / CHUNK_SIZE))
-    modulated_wave = samples * wave
-    filtered_wave = lfilter(b, a, modulated_wave)
-    line.set_ydata(filtered_wave)
-    # ax.fill_between(x, 0, filtered_wave, where=filtered_wave>=0, interpolate=True, color='blue', alpha=0.25)
-    # ax.fill_between(x, 0, filtered_wave, where=filtered_wave<0, interpolate=True, color='red', alpha=0.25)
-    fig.canvas.draw()
-    plt.pause(0.001)
-    if streaming.get():
-        root.after(1, visualize_audio)
-
-
-def start_streaming():
-    global streaming
-    streaming.set(True)
-    visualize_audio()
-
-def stop_streaming():
-    global streaming
-    streaming.set(False)
 
 
 root = tk.Tk()

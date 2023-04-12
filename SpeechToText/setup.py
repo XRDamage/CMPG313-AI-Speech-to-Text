@@ -1,12 +1,15 @@
 import os
 import threading
+import signal
 import tkinter as tk
 from tkinter import ttk
 
 def setup_enviroment():
-    os.system("C:\\Users\\jeand\\anaconda3\\Scripts\\activate.bat && call conda.bat activate whisper && conda init powershell && cd C:\\Users\\jeand\\My Drive\\University\\ai\\SpeechToText\\ && conda activate whisper && pip install -r requirements.txt")
-    # root.withdraw() has to be here or closed here. Unable to just add it here. Trying to find a alternitave
+    # C:\\Users\\jeand\\anaconda3\\Scripts\\activate.bat && call conda.bat activate whisper && conda init powershell && cd C:\\Users\\jeand\\My Drive\\University\\ai\\SpeechToText\\ && conda activate whisper && pip install -r requirements.txt && python mic.py --model tiny --english
+    os.system("C:\\Users\\jeand\\anaconda3\\Scripts\\activate.bat && call conda.bat activate whisper && conda init powershell && cd C:\\Users\\jeand\\My Drive\\University\\ai\\SpeechToText\\ && conda activate whisper")
+    root.withdraw() # has to be here or closed here. Unable to just add it here. Trying to find a alternitave
     os.system("python mic.py --model tiny --english")
+    os.kill(os.getpid(), signal.SIGINT)
 
 # self explanatory, Plain GUI design
 root = tk.Tk()

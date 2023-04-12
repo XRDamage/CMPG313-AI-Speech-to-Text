@@ -5,6 +5,7 @@ import whisper
 import queue
 import tempfile
 import os
+import signal
 import threading
 import click
 import torch
@@ -95,7 +96,38 @@ def transcribe_forever(audio_queue, result_queue, audio_model, english, verbose,
             os.remove(audio_data)
 
 
+def visualize_audio():
+    data = stream.read(CHUNK_SIZE)
+    samples = np.frombuffer(data, dtype=np.int16)
+    samples = samples / 32768.0
+    wave = np.sin(np.arange(CHUNK_SIZE) * (1 * np.pi * 1 / CHUNK_SIZE))
+    modulated_wave = samples * wave
+    filtered_wave = lfilter(b, a, modulated_wave)
+    line.set_ydata(filtered_wave)
+    # ax.fill_between(x, 0, filtered_wave, where=filtered_wave>=0, interpolate=True, color='blue', alpha=0.25)
+    # ax.fill_between(x, 0, filtered_wave, where=filtered_wave<0, interpolate=True, color='red', alpha=0.25)
+    fig.canvas.draw()
+    plt.pause(0.001)
+    if streaming.get():
+        root.after(1, visualize_audio)
 
+
+def start_streaming():
+    threading.Thread(target=main).start()
+    global streaming
+    streaming.set(True)
+    visualize_audio()
+
+def stop_streaming():
+    global streaming
+    streaming.set(False)
+    root.destroy()
+    os.kill(os.getpid(), signal.SIGINT)
+
+
+
+
+#####################################################################  GUI DESIGHN   #####################################################################
 CHUNK_SIZE = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -126,31 +158,6 @@ order = 5
 normal_cutoff = cutoff / nyq
 b, a = butter(order, normal_cutoff, btype='low', analog=False)
 
-def visualize_audio():
-    data = stream.read(CHUNK_SIZE)
-    samples = np.frombuffer(data, dtype=np.int16)
-    samples = samples / 32768.0
-    wave = np.sin(np.arange(CHUNK_SIZE) * (1 * np.pi * 1 / CHUNK_SIZE))
-    modulated_wave = samples * wave
-    filtered_wave = lfilter(b, a, modulated_wave)
-    line.set_ydata(filtered_wave)
-    # ax.fill_between(x, 0, filtered_wave, where=filtered_wave>=0, interpolate=True, color='blue', alpha=0.25)
-    # ax.fill_between(x, 0, filtered_wave, where=filtered_wave<0, interpolate=True, color='red', alpha=0.25)
-    fig.canvas.draw()
-    plt.pause(0.001)
-    if streaming.get():
-        root.after(1, visualize_audio)
-
-
-def start_streaming():
-    threading.Thread(target=main).start()
-    global streaming
-    streaming.set(True)
-    visualize_audio()
-
-def stop_streaming():
-    global streaming
-    streaming.set(False)
 
 
 root = tk.Tk()
