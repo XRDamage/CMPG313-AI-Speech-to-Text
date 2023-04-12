@@ -88,7 +88,7 @@ def transcribe_forever(audio_queue, result_queue, audio_model, english, verbose,
 
         if not verbose:
             predicted_text = result["text"]
-            result_queue.put_nowait("You said: " + predicted_text + "\n")
+            result_queue.put_nowait(predicted_text + "\n")
         else:
             result_queue.put_nowait(result)
 
@@ -157,7 +157,6 @@ cutoff = 500
 order = 5
 normal_cutoff = cutoff / nyq
 b, a = butter(order, normal_cutoff, btype='low', analog=False)
-
 
 
 root = tk.Tk()

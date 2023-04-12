@@ -1,3 +1,5 @@
+# just to test the gui side without running the transcription model.
+
 import pyaudio
 import numpy as np
 import matplotlib.pyplot as plt

@@ -7,9 +7,9 @@ from tkinter import ttk
 def setup_enviroment():
     # C:\\Users\\jeand\\anaconda3\\Scripts\\activate.bat && call conda.bat activate whisper && conda init powershell && cd C:\\Users\\jeand\\My Drive\\University\\ai\\SpeechToText\\ && conda activate whisper && pip install -r requirements.txt && python mic.py --model tiny --english
     os.system("C:\\Users\\jeand\\anaconda3\\Scripts\\activate.bat && call conda.bat activate whisper && conda init powershell && cd C:\\Users\\jeand\\My Drive\\University\\ai\\SpeechToText\\ && conda activate whisper")
-    root.withdraw() # has to be here or closed here. Unable to just add it here. Trying to find a alternitave
+    root.withdraw()
     os.system("python mic.py --model tiny --english")
-    os.kill(os.getpid(), signal.SIGINT)
+    os.kill(os.getpid(), signal.SIGINT) # ensures whole program is terminated when it is closed.
 
 # self explanatory, Plain GUI design
 root = tk.Tk()
